@@ -1,0 +1,6 @@
+# $FreeBSD: src/sys/mips/idt/std.idt,v 1.2.2.1.2.1 2009/10/25 01:10:29 kensmith Exp $
+# Standard include file for IDT
+
+files	"../idt/files.idt"
+
+options		ISA_MIPS32

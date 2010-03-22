@@ -1,0 +1,5 @@
+# $FreeBSD: src/sys/arm/mv/std.mv,v 1.1.2.1.2.1 2009/10/25 01:10:29 kensmith Exp $
+
+files		"../mv/files.mv"
+cpu		CPU_ARM9E
+makeoptions	CONF_CFLAGS="-march=armv5te"

@@ -1,0 +1,16 @@
+#
+# DEFAULTS -- Default kernel configuration file for FreeBSD/powerpc
+#
+# $FreeBSD: src/sys/powerpc/conf/DEFAULTS,v 1.12.2.1.2.1 2009/10/25 01:10:29 kensmith Exp $
+
+machine		powerpc
+
+# Pseudo devices.
+device		mem		# Memory and kernel memory devices
+
+# UART chips on this platform
+device		uart_ns8250
+device		uart_z8530
+
+options 	GEOM_PART_APM
+options 	GEOM_PART_MBR

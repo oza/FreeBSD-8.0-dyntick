@@ -1,0 +1,8 @@
+# $FreeBSD: src/sys/arm/mv/kirkwood/std.sheevaplug,v 1.1.2.2.2.1 2009/10/25 01:10:29 kensmith Exp $
+
+include	"../mv/std.mv"
+include "../mv/kirkwood/std.kirkwood"
+files	"../mv/kirkwood/files.sheevaplug"
+
+options		PHYSMEM_SIZE=0x20000000
+options		MII_ADDR_BASE=0

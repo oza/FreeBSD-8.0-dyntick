@@ -1,0 +1,8 @@
+# $FreeBSD: src/sys/mips/idt/files.idt,v 1.2.2.1.2.1 2009/10/25 01:10:29 kensmith Exp $
+
+mips/idt/idt_machdep.c		standard
+mips/idt/idtpci.c		optional pci
+mips/idt/if_kr.c		optional kr
+mips/idt/obio.c			standard
+mips/idt/uart_cpu_rc32434.c	optional uart
+mips/idt/uart_bus_rc32434.c	optional uart
