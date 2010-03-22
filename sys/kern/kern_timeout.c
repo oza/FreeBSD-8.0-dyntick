@@ -55,6 +55,7 @@ __FBSDID("$FreeBSD: src/sys/kern/kern_timeout.c,v 1.118.2.1.2.1 2009/10/25 01:10
 #include <sys/sleepqueue.h>
 #include <sys/sysctl.h>
 #include <sys/smp.h>
+#include <sys/dynticks.h>
 
 SDT_PROVIDER_DEFINE(callout_execute);
 SDT_PROBE_DEFINE(callout_execute, kernel, , callout_start);
@@ -883,3 +884,32 @@ adjust_timeout_calltodo(time_change)
 	return;
 }
 #endif /* APM_FIXUP_CALLTODO */
+
+int
+callout_get_next_event(void)
+{
+	struct callout_cpu *cc;
+	struct callout *c;
+	struct callout_tailq *sc;
+	int curticks;
+	int skip = 1;
+
+	cc = CC_SELF();
+	curticks = cc->cc_softticks;
+
+	while( skip < ncallout ) {
+		sc = &cc->cc_callwheel[ (curticks+skip) & callwheelmask ];
+		/* search scanning ticks */
+		TAILQ_FOREACH( c, sc, c_links.tqe ){
+			if( c && c->c_time <= curticks + ncallout ){
+				if( c->c_time > 0 ){
+					goto out;
+				}
+			}
+		}
+		skip++;
+	}
+
+out:
+	return skip;
+}

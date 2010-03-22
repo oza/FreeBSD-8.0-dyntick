@@ -227,6 +227,7 @@ void	realitexpire(void *);
 int	sysbeep(int hertz, int period);
 
 void	hardclock(int usermode, uintfptr_t pc);
+void	hardclock_dynticks(int usermode, uintfptr_t pc,int skip);
 void	hardclock_cpu(int usermode);
 void	softclock(void *);
 void	statclock(int usermode);

@@ -323,6 +323,33 @@ hardclock(int usermode, uintfptr_t pc)
 #endif /* SW_WATCHDOG */
 }
 
+void
+hardclock_dynticks(int usermode, uintfptr_t pc,int skip)
+{
+	//int i;
+
+	//atomic_add_int((volatile int *)&ticks, skip); // FIXME
+	atomic_add_int((volatile int *)&ticks, 1);
+	hardclock_cpu(usermode);
+	tc_ticktock();
+	/*
+	 * If no separate statistics clock is available, run it from here.
+	 *
+	 * XXX: this only works for UP
+	 */
+	if (stathz == 0) {
+		profclock(usermode, pc);
+		statclock(usermode);
+	}
+#ifdef DEVICE_POLLING
+	hardclock_device_poll();	/* this is very short and quick */
+#endif /* DEVICE_POLLING */
+#ifdef SW_WATCHDOG
+	if (watchdog_enabled > 0 && (watchdog_ticks -= skip ) <= 0)
+		watchdog_fire();
+#endif /* SW_WATCHDOG */
+}
+
 /*
  * Compute number of ticks in the specified amount of time.
  */
