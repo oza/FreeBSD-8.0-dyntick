@@ -1422,12 +1422,28 @@ lapic_ipi_vectored(u_int vector, int dest)
 }
 #endif /* SMP */
 
+static void set_next_timer_interrupt(void)
+{
+	struct lapic *la;
+	int skip;
+	u_long cnt_to_skip;
+
+	la = &lapics[PCPU_GET(apic_id)];
+	(*la->la_timer_count)++;
+	
+	skip = callout_get_next_event();
+	cnt_to_skip = lapic_timer_period * skip ;
+	lapic_timer_oneshot(cnt_to_skip);
+	la->la_skip = skip;
+	la->la_cur_skip = 0;
+
+	return;
+}
 
 static void
 lapic_handle_timer_dynamically(struct trapframe *frame)
 {
 	struct lapic *la;
-	u_long cnt_to_skip;
 	int skip;
 	int i;
 
@@ -1495,19 +1511,16 @@ lapic_handle_timer_dynamically(struct trapframe *frame)
 		}
 	}
 
-	/* get next interrupt time */
-	skip = callout_get_next_event();
-	cnt_to_skip = lapic_timer_period * skip ;
-	lapic_timer_oneshot(cnt_to_skip);
-	la->la_skip = skip;
-	la->la_cur_skip = 0;
-	
+	set_next_timer_interrupt();
 	critical_exit();
 }
 
 void switch_to_dynticks(void)
 {
+	critical_enter();
 	timer_handler = lapic_handle_timer_dynamically;
+	set_next_timer_interrupt();
+	critical_exit();
 }
 
 void switch_to_perticks(void)
