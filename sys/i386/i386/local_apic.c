@@ -1498,7 +1498,7 @@ lapic_handle_timer_dynamically(struct trapframe *frame)
 	/* get next interrupt time */
 	skip = callout_get_next_event();
 	cnt_to_skip = lapic_timer_period * skip ;
-	lapic_timer_oneshot( cnt_to_skip );
+	lapic_timer_oneshot(cnt_to_skip);
 	la->la_skip = skip;
 	la->la_cur_skip = 0;
 	
@@ -1512,5 +1512,8 @@ void switch_to_dynticks(void)
 
 void switch_to_perticks(void)
 {
+	critical_enter();
 	timer_handler = __lapic_handle_timer;
+	lapic_timer_periodic(lapic_timer_period);
+	critical_exit();
 }
