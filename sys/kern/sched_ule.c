@@ -62,6 +62,7 @@ __FBSDID("$FreeBSD: src/sys/kern/sched_ule.c,v 1.257.2.3.2.1 2009/10/25 01:10:29
 #include <sys/vmmeter.h>
 #include <sys/cpuset.h>
 #include <sys/sbuf.h>
+#include <sys/dynticks.h>
 #ifdef KTRACE
 #include <sys/uio.h>
 #include <sys/ktrace.h>
@@ -2558,9 +2559,12 @@ sched_idletd(void *dummy)
 			}
 		}
 		switchcnt = tdq->tdq_switchcnt + tdq->tdq_oldswitchcnt;
-		if (tdq->tdq_load == 0)
+		if (tdq->tdq_load == 0){
+			switch_to_dynticks();
 			cpu_idle(switchcnt > 1);
-		if (tdq->tdq_load) {
+			/* wake up here */
+			switch_to_perticks();
+		}if (tdq->tdq_load) {
 			thread_lock(td);
 			mi_switch(SW_VOL | SWT_IDLE, NULL);
 			thread_unlock(td);
